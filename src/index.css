@@ -1,0 +1,442 @@
+/*  Tema global: Punto y Sal */
+:root {
+  --primary-color: #000000;      /* Negro principal */
+  --secondary-color: #e53935;    /* Rojo de acento */
+  --accent-color: #ffffff;       /* Blanco */
+  --text-color: #1a1a1a;         /* Negro suave para texto */
+  --bg-color: #f8f8f8;           /* Fondo gris claro */
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Fondo general */
+body {
+  margin: 0;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  
+}
+
+/* Scroll personalizado (negro con acento rojo al pasar el mouse) */
+::-webkit-scrollbar {
+  width: 10px;
+}/* TEMA GLOBAL - PUNTO Y SAL */
+:root {
+  --primary-color: #000000;      /* Negro principal */
+  --secondary-color: #e53935;    /* Rojo de acento */
+  --accent-color: #ffffff;       /* Blanco */
+  --text-color: #1a1a1a;         /* Negro suave */
+  --bg-color: #f8f8f8;           /* Fondo gris claro */
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ESTRUCTURA BASE */
+body {
+  margin: 0;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+/*SCROLL PERSONALIZADO*/
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--secondary-color);
+}
+
+/* BOTONES GENERALES */
+button {
+  transition: all 0.25s ease;
+  font-family: inherit;
+  font-weight: 500;
+}
+button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: var(--shadow);
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Botón principal reutilizable */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+}
+
+/* INPUTS Y SELECTS*/
+input, select {
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: 0.2s;
+}
+input:focus, select:focus {
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  outline: none;
+}
+
+/* TABLAS (ESTILO OSCURO) */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95rem;
+  background-color: #fff;
+  color: #000;
+}
+th {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid var(--secondary-color);
+}
+td {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/*  MODALES */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal {
+  background: var(--accent-color);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  border-top: 5px solid var(--secondary-color);
+  animation: popUp 0.4s ease-out forwards;
+}
+.modal h2, .modal h3 {
+  color: var(--primary-color);
+}
+.modal button {
+  margin-top: 15px;
+}
+
+/*ENCABEZADOS Y TEXTO*/
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/*TARJETAS / SECCIONES */
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 10px 0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: fadeUp 0.6s ease-out;
+}
+.card:hover {
+  transform: scale(1.02);
+}
+
+/*ERRORES / ALERTAS*/
+.alert-error {
+  background-color: rgba(229, 57, 53, 0.1);
+  border-left: 5px solid var(--secondary-color);
+  color: var(--secondary-color);
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+/*FOOTER */
+footer {
+  margin-top: 25px;
+  color: #555;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/*ANIMACIONES BASE (suaves y genéricas)*/
+
+/* Emerge desde abajo */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Emerge con desenfoque */
+@keyframes blurIn {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+/* Aparece desde el centro (para modales) */
+@keyframes popUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Clases utilitarias */
+.fade-up { animation: fadeUp 1s ease-out forwards; }
+.blur-in { animation: blurIn 0.7s ease-out forwards; }
+
+::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Botones */
+button {
+  transition: all 0.25s ease;
+  font-family: inherit;
+  font-weight: 500;
+}
+button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: var(--shadow);
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Botón principal */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Inputs y selects */
+input, select {
+  font-family: inherit;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: 0.2s;
+}
+input:focus, select:focus {
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  outline: none;
+}
+
+/* Tablas negras*/
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95rem;
+  background-color: #fff;
+  color: #000;
+}
+th {
+  background-color: var(--primary-color);
+  color: var(--accent-color);
+  padding: 10px;
+  text-align: left;
+  border-bottom: 2px solid var(--secondary-color);
+}
+td {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+tr:nth-child(even) {
+  background-color: #f5f5f5;
+}
+tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal {
+  background: var(--accent-color);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  border-top: 5px solid var(--secondary-color);
+}
+.modal h2, .modal h3 {
+  color: var(--primary-color);
+}
+.modal button {
+  margin-top: 15px;
+}
+
+/* Encabezados */
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Tarjetas o secciones */
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 10px 0;
+  transition: transform 0.25s ease;
+}
+.card:hover {
+  transform: scale(1.02);
+}
+
+/* Errores o alertas */
+.alert-error {
+  background-color: rgba(229, 57, 53, 0.1);
+  border-left: 5px solid var(--secondary-color);
+  color: var(--secondary-color);
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+/* Footer general */
+footer {
+  margin-top: 25px;
+  color: #555;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* === Animaciones de entrada suaves === */
+
+/* Emerge desde abajo con desvanecimiento */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Emerge desde el centro (para modales o diálogos) */
+@keyframes popUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes blurIn {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+.blur-in {
+  animation: blurIn 0.7s ease-out forwards;
+}
+
+/* Aplicación general a contenedores */
+.fade-up {
+  animation: fadeUp 1s ease-out forwards;
+}
+
+/* Aplicación a modales */
+.modal {
+  animation: popUp 0.4s ease-out forwards;
+}
+
+/* para tarjetas o secciones */
+.card {
+  animation: fadeUp 0.6s ease-out;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
