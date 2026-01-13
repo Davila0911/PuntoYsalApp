@@ -106,6 +106,7 @@ const fetchRecords = async (pagina = 1) => {
             <thead>
               <tr style={styles.tableHeader}>
               <th style={styles.th}>Código</th>
+              <th style={styles.th}>Producto</th>
               <th style={styles.th}>Inventario Inicial</th>
               <th style={styles.th}>Entradas</th>
               <th style={styles.th}>Dañados</th>
@@ -120,6 +121,7 @@ const fetchRecords = async (pagina = 1) => {
               {records.map((r, i) => (
                 <tr key={i}>
                 <td style={styles.td}>{r.productCode}</td>
+                <td style={styles.td}>{r.productName}</td>
                 <td style={styles.td}>{r.initialInventory}</td>
                 <td style={styles.td}>{r.entries}</td>
                 <td style={styles.td}>{r.damaged}</td>
