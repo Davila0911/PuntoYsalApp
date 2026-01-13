@@ -72,7 +72,8 @@ const fetchRecords = async (pagina = 1) => {
     <option value="Marifonseca">María Fonseca</option>
     <option value="SherMurillo">Sherlyn Murillo</option>
     <option value="Jcastillo">Juan Castillo</option>
-    <option value="Gperez">Geidy Pérez</option>
+    <option value="Elisanchez">Elisa Sanchez</option>
+    <option value="Lorebustillo">Lorena Bustillo</option>
 
   </select>
 
