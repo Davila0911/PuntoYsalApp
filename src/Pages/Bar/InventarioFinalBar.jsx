@@ -119,8 +119,9 @@ useEffect(() => {
                         value={conteos[p.code] || ""}
                         onChange={(e) =>
                           setConteos({ ...conteos, [p.code]: e.target.value })
-                        }
+                        }               
                         style={styles.input}
+                          placeholder="0"
                       />
                     </td>
                     <td style={styles.td}>
