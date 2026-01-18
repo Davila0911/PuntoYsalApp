@@ -65,7 +65,7 @@ const fetchRecords = async (pagina = 1) => {
     onChange={(e) => setUserName(e.target.value)}
     style={styles.select}
   >
-    <option value="">Seleccione un usuario...</option>
+    <option value="">Seleccione un usuario</option>
     <option value="Astridvalle">Astrid Valle</option>
     <option value="Alevaldez">Alexis Valdez</option>
     <option value="Elinuñez">Elizabeth Nuñez</option>

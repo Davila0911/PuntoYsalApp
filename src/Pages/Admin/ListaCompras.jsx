@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getLowStockProducts } from "../../api/ListadecomprasApi";
 
 function ListaCompras() {
-  const [tipoInventario, setTipoInventario] = useState("Cocina"); // Cocina o Bar
+  const [tipoInventario, setTipoInventario] = useState("Cocina"); 
   const [productos, setProductos] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -16,8 +16,6 @@ function ListaCompras() {
         setLoading(true);
         const tipoEnum = tipoInventario === "Bar" ? 0 : 1;
         const data = await getLowStockProducts(tipoEnum);
-
-        // Si el backend devuelve un array completo, lo paginamos manualmente
         const start = (page - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         const pageData = data.slice(start, end);

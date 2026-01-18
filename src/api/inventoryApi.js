@@ -6,13 +6,21 @@ const API_URL = `${API_BASE_URL}/api/inventory`;
 /**
  * Obtener inventario (Cocina o Bar) con paginación
  */
-export async function getInventory(tipo = null, page = 1, pageSize = 10) {
+export async function getInventory(tipo = null, page = 1, pageSize = 10, category = "") {
   const token = getToken();
 
-  const url =
-    tipo !== null
-      ? `${API_URL}?inventoryType=${tipo}&page=${page}&pageSize=${pageSize}`
-      : `${API_URL}?page=${page}&pageSize=${pageSize}`;
+  // Construimos la URL base con los parámetros obligatorios
+  let url = `${API_URL}?page=${page}&pageSize=${pageSize}`;
+
+  // Si hay tipo, lo agregamos
+  if (tipo !== null) {
+    url += `&inventoryType=${tipo}`;
+  }
+
+  // SI hay categoría y no está vacía, la agregamos codificada para la URL
+  if (category && category.trim() !== "") {
+    url += `&category=${encodeURIComponent(category)}`;
+  }
 
   const response = await fetch(url, {
     headers: {

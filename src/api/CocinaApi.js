@@ -20,17 +20,21 @@ const getTimeZoneId = () => {
   return tz || "Central America Standard Time";
 };
 
-// Obtener inventario de cocina
-export const getCocinaInventory = async (page = 1, itemsPerPage = 10) => {
+// Obtener inventario de cocina con filtro de categoría
+export const getCocinaInventory = async (page = 1, itemsPerPage = 10, category = "") => {
   try {
-    const res = await fetch(
-      `${BASE_URL}/inventory?inventoryType=1&page=${page}&itemsPerPage=${itemsPerPage}`,
-      { headers: getHeaders() }
-    );
+    let url = `${BASE_URL}/inventory?inventoryType=1&page=${page}&itemsPerPage=${itemsPerPage}`;
+    
+    // Si hay categoría, se añade a la query
+    if (category && category.trim() !== "") {
+      url += `&category=${encodeURIComponent(category)}`;
+    }
+
+    const res = await fetch(url, { headers: getHeaders() });
 
     if (!res.ok) throw new Error("Error al obtener inventario de cocina");
     return await res.json();
-  } catch {
+  } catch (error) {
     throw new Error("No se pudo obtener el inventario de cocina");
   }
 };

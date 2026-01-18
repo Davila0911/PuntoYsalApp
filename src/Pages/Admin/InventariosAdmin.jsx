@@ -1,6 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { getInventory, updateStock } from "../../api/inventoryApi";
 
+// Categorias
+const categoriasCocina = [
+  "Verduras y frutas",
+  "Lácteos",
+  "Carnes & Embutidos",
+  "Aceite & Grasa",
+  "Salsas & Aderezos",
+  "Subproductos (prep)",
+  "Panes y harinas",
+  "Condimentos",
+  "Limpieza & Otros",
+];
+
+const categoriasBar = [
+  "Gaseosas",
+  "Jugos",
+  "Frutas y frutas congeladas",
+  "Tizanas",
+  "Finest Call",
+  "Leches líquidas y en polvo",
+  "Whisky",
+  "Ron",
+  "Vodka",
+  "Tequila",
+  "Gin",
+  "Otros licores",
+  "Vinos Tintos",
+  "Vinos Blancos",
+  "Cervezas",
+  "Productos Variados",
+  "Plásticos",
+  "Limpieza",
+  "Postres",
+];
+
 function InventariosAdmin() {
   const [tipoInventario, setTipoInventario] = useState("Cocina");
   const [datos, setDatos] = useState([]);
@@ -10,138 +45,100 @@ function InventariosAdmin() {
   const [loading, setLoading] = useState(false);
   const [productosActualizados, setProductosActualizados] = useState([]);
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
+
   const itemsPerPage = 10;
 
-  // Cargar inventario desde backend 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const tipoEnum = tipoInventario === "Bar" ? 0 : 1;
-      const data = await getInventory(tipoEnum, page, itemsPerPage);
+  // Cargar inventario enviando la categoría al backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const tipoEnum = tipoInventario === "Bar" ? 0 : 1;
+        
+        // --- CAMBIO: Enviamos categoriaSeleccionada al API ---
+        const data = await getInventory(tipoEnum, page, itemsPerPage, categoriaSeleccionada);
 
-      const inventarioReal = data.inventory.map((item) => ({
-        code: item.code,
-        product: item.product,
-        category: item.category,
-        measurementUnit: item.measurementUnit,
-        currentStock: item.currentStock ?? 0,
-        stockMinimo: item.minimumStock ?? 0,
-        saved: false,
-      }));
+        const inventarioReal = data.inventory.map((item) => ({
+          code: item.code,
+          product: item.product,
+          category: item.category,
+          measurementUnit: item.measurementUnit,
+          currentStock: item.currentStock ?? 0,
+          stockMinimo: item.minimumStock ?? 0,
+          saved: false,
+        }));
 
-      setDatos(inventarioReal);
-      setOriginalData(inventarioReal.map((i) => ({ ...i })));
-      setTotalPages(Math.ceil((data.productCount || 1) / itemsPerPage));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, [tipoInventario, page]);
-
-//Actualizar valor localmente y reactivar botón si cambia ===
-const handleStockChange = (codigo, nuevoValor) => {
-  // Permitir solo números con decimales
-  if (!/^\d*\.?\d*$/.test(nuevoValor)) return;
-
-  setDatos((prev) =>
-    prev.map((item) => {
-      if (item.code === codigo) {
-        const original = originalData.find((o) => o.code === codigo);
-
-        const nuevoNum = parseFloat(nuevoValor || 0);
-        const originalNum = parseFloat(original?.currentStock || 0);
-
-        return {
-          ...item,
-          currentStock: nuevoValor,
-          saved: nuevoNum === originalNum
-        };
+        setDatos(inventarioReal);
+        setOriginalData(inventarioReal.map((i) => ({ ...i })));
+        setTotalPages(Math.ceil((data.productCount || 1) / itemsPerPage));
+      } catch (error) {
+        console.error("Error al cargar inventario", error);
+      } finally {
+        setLoading(false);
       }
-      return item;
-    })
-  );
-};
+    };
 
-// === Guardar cambios individuales ===
-const handleSave = async (productName, currentStock) => {
-  try {
-    const nuevoStock = parseFloat(currentStock);
+    fetchData();
+  }, [tipoInventario, page, categoriaSeleccionada]); // Se dispara al cambiar la categoría
 
-    if (isNaN(nuevoStock)) {
-      alert("Por favor ingrese un número válido.");
-      return;
-    }
+  // Al cambiar de Cocina a Bar o viceversa, limpiamos categoría y volvemos a pág 1
+  const cambiarTipoInventario = (tipo) => {
+    setTipoInventario(tipo);
+    setCategoriaSeleccionada("");
+    setPage(1);
+  };
 
-    const tipoEnum = tipoInventario === "Bar" ? 0 : 1;
-    await updateStock(productName, nuevoStock, tipoEnum);
+  const handleStockChange = (codigo, nuevoValor) => {
+    if (!/^\d*\.?\d*$/.test(nuevoValor)) return;
 
-    setProductosActualizados((prev) => [...prev, productName]);
-
-    // Marcar como guardado
     setDatos((prev) =>
-      prev.map((item) =>
-        item.product === productName
-          ? { ...item, currentStock: currentStock, saved: true }
-          : item
-      )
+      prev.map((item) => {
+        if (item.code === codigo) {
+          const original = originalData.find((o) => o.code === codigo);
+          const nuevoNum = parseFloat(nuevoValor || 0);
+          const originalNum = parseFloat(original?.currentStock || 0);
+          return {
+            ...item,
+            currentStock: nuevoValor,
+            saved: nuevoNum === originalNum,
+          };
+        }
+        return item;
+      })
     );
-  } catch {
-    alert("Error al guardar cambios");
-  }
-};
-
-  // === Mostrar modal ===
-  const handleMostrarResumen = () => {
-  // Siempre abrir el modal, aunque no haya productos
-  setMostrarModal(true);
-};
-
-  const handleCerrarModal = () => {
-    setMostrarModal(false);
-    setProductosActualizados([]);
   };
 
-// === Determinar color de fila según el nivel de stock ===
-const getRowStyle = (item) => {
-  const stock = parseFloat(item.currentStock);
-  const min = parseFloat(item.stockMinimo);
+  const handleSave = async (productName, currentStock) => {
+    try {
+      const nuevoStock = parseFloat(currentStock);
+      if (isNaN(nuevoStock)) return alert("Número inválido.");
 
-  if (stock <= min) return { backgroundColor: "#ffcccc", transition: "0.3s" };
-  return { transition: "0.3s" }; // normal
-};
+      const tipoEnum = tipoInventario === "Bar" ? 0 : 1;
+      await updateStock(productName, nuevoStock, tipoEnum);
 
-// === Determinar si el botón debe estar deshabilitado ===
-const isButtonDisabled = (item) => {
-  const original = originalData.find((o) => o.code === item.code);
-  if (!original) return false;
-  return (
-    item.saved ||
-    parseFloat(item.currentStock) === parseFloat(original.currentStock)
-  );
-};
-
-  // === Hover visual ===
-  const hoverEffect = (e, enter) => {
-    if (enter) {
-      e.target.style.transform = "scale(1.05)";
-      e.target.style.boxShadow = "0px 6px 15px rgba(0,0,0,0.2)";
-    } else {
-      e.target.style.transform = "scale(1)";
-      e.target.style.boxShadow = "0px 3px 6px rgba(0,0,0,0.1)";
+      setProductosActualizados((prev) => [...prev, productName]);
+      setDatos((prev) =>
+        prev.map((item) =>
+          item.product === productName
+            ? { ...item, currentStock: currentStock, saved: true }
+            : item
+        )
+      );
+    } catch {
+      alert("Error al guardar cambios");
     }
   };
+
+  const listaCategorias = tipoInventario === "Cocina" ? categoriasCocina : categoriasBar;
 
   return (
     <div style={styles.container} className="blur-in">
       <h2 style={styles.title}>Inventario de {tipoInventario}</h2>
 
-      {/* Selector */}
       <div style={styles.selectorContainer}>
         <button
-          onClick={() => setTipoInventario("Cocina")}
+          onClick={() => cambiarTipoInventario("Cocina")}
           style={{
             ...styles.selectorBtn,
             backgroundColor: tipoInventario === "Cocina" ? "#8b0101ff" : "#bbb",
@@ -150,7 +147,7 @@ const isButtonDisabled = (item) => {
           Cocina
         </button>
         <button
-          onClick={() => setTipoInventario("Bar")}
+          onClick={() => cambiarTipoInventario("Bar")}
           style={{
             ...styles.selectorBtn,
             backgroundColor: tipoInventario === "Bar" ? "#8b0101ff" : "#bbb",
@@ -160,105 +157,87 @@ const isButtonDisabled = (item) => {
         </button>
       </div>
 
-{/* Tabla */}
-{loading ? (
-  <p style={{ textAlign: "center" }}>Cargando inventario...</p>
-) : (
-  <div style={styles.tableWrapper}>
-    <table style={styles.table}>
-      <thead>
-        <tr style={styles.tableHeader}>
-          <th style={styles.th}>Código</th>
-          <th style={styles.th}>Producto</th>
-          <th style={styles.th}>Categoría</th>
-          <th style={styles.th}>Unidad</th>
-          <th style={styles.th}>Stock Actual</th>
-          <th style={styles.th}>Stock Mínimo</th>
-          <th style={styles.th}>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {datos.map((item) => {
-          const disabled = isButtonDisabled(item);
-          return (
-            <tr key={item.code} style={getRowStyle(item)}>
-              <td style={styles.td}>{item.code}</td>
-              <td style={styles.td}>{item.product}</td>
-              <td style={styles.td}>{item.category}</td>
-              <td style={styles.td}>{item.measurementUnit || "-"}</td>
-              <td style={styles.td}>
-                <input
-                  type="number"
-                  min="0"
-                  value={item.currentStock}
-                  onChange={(e) =>
-                    handleStockChange(item.code, e.target.value)
-                  }
-                  style={styles.input}
-                />
-              </td>
-              <td style={styles.td}>{item.stockMinimo}</td>
-              <td style={styles.td}>
-                <button
-                  onClick={() =>
-                    handleSave(item.product, item.currentStock)
-                  }
-                  style={{
-                    ...styles.saveBtn,
-                    backgroundColor: disabled ? "#9e9e9e" : "#2e7d32",
-                    cursor: disabled ? "not-allowed" : "pointer",
-                  }}
-                  disabled={disabled}
-                  onMouseEnter={(e) =>
-                    !disabled && hoverEffect(e, true)
-                  }
-                  onMouseLeave={(e) =>
-                    !disabled && hoverEffect(e, false)
-                  }
-                >
-                  {item.saved ? "Guardado" : "Guardar"}
-                </button>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  </div>
-)}
-      {/* Botón modal */}
-      <div style={{ marginTop: "25px" }}>
-        <button style={styles.pageBtn} onClick={handleMostrarResumen}>
-          Ver productos actualizados
-        </button>
+      <div style={styles.filterContainer}>
+        <label style={styles.filterLabel}>Filtrar por categoría: </label>
+        <select
+          value={categoriaSeleccionada}
+          onChange={(e) => {
+            setCategoriaSeleccionada(e.target.value);
+            setPage(1); // Resetear a página 1 al filtrar
+          }}
+          style={styles.selectFilter}
+        >
+          <option value="">-- Ver Todo --</option>
+          {listaCategorias.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Modal */}
-      {mostrarModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal} className="fade-up">
-            <h3>Productos actualizados</h3>
-
-            {productosActualizados.length === 0 ? (
-              <p style={{ color: "#555", fontStyle: "italic", marginTop: "10px" }}>
-                No se han actualizado productos.
-              </p>
-            ) : (
-              <ul style={{ textAlign: "left", marginTop: "10px" }}>
-                {productosActualizados.map((p, i) => (
-                  <li key={i}>{p}</li>
-                ))}
-              </ul>
-            )}
-
-            <button style={styles.pageBtn} onClick={handleCerrarModal}>
-              Cerrar
-            </button>
-          </div>
+      {loading ? (
+        <p style={{ textAlign: "center" }}>Cargando inventario...</p>
+      ) : (
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr style={styles.tableHeader}>
+                <th style={styles.th}>Código</th>
+                <th style={styles.th}>Producto</th>
+                <th style={styles.th}>Categoría</th>
+                <th style={styles.th}>Unidad</th>
+                <th style={styles.th}>Stock Actual</th>
+                <th style={styles.th}>Stock Mínimo</th>
+                <th style={styles.th}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {datos.length === 0 ? (
+                <tr>
+                  <td colSpan="7" style={{ padding: "20px", color: "#666" }}>
+                    No hay productos disponibles.
+                  </td>
+                </tr>
+              ) : (
+                datos.map((item) => (
+                  <tr key={item.code} style={parseFloat(item.currentStock) <= parseFloat(item.stockMinimo) ? {backgroundColor: "#ffcccc"} : {}}>
+                    <td style={styles.td}>{item.code}</td>
+                    <td style={styles.td}>{item.product}</td>
+                    <td style={styles.td}>{item.category}</td>
+                    <td style={styles.td}>{item.measurementUnit || "-"}</td>
+                    <td style={styles.td}>
+                      <input
+                        type="number"
+                        min="0"
+                        value={item.currentStock}
+                        onChange={(e) => handleStockChange(item.code, e.target.value)}
+                        style={styles.input}
+                      />
+                    </td>
+                    <td style={styles.td}>{item.stockMinimo}</td>
+                    <td style={styles.td}>
+                      <button
+                        onClick={() => handleSave(item.product, item.currentStock)}
+                        style={{
+                          ...styles.saveBtn,
+                          backgroundColor: (item.saved || parseFloat(item.currentStock) === parseFloat(originalData.find(o => o.code === item.code)?.currentStock)) ? "#9e9e9e" : "#2e7d32",
+                          cursor: (item.saved) ? "not-allowed" : "pointer",
+                        }}
+                        disabled={item.saved}
+                      >
+                        {item.saved ? "Guardado" : "Guardar"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
-      {/* Paginación */}
+      {/* Botones de Paginación */}
       <div style={styles.pagination}>
         <button
           disabled={page === 1}
@@ -267,9 +246,7 @@ const isButtonDisabled = (item) => {
         >
           Anterior
         </button>
-        <span style={styles.pageText}>
-          Página {page} de {totalPages}
-        </span>
+        <span style={styles.pageText}>Página {page} de {totalPages}</span>
         <button
           disabled={page === totalPages}
           onClick={() => setPage((p) => p + 1)}
@@ -278,16 +255,38 @@ const isButtonDisabled = (item) => {
           Siguiente
         </button>
       </div>
+
+      <div style={{ marginTop: "25px" }}>
+        <button style={styles.pageBtn} onClick={() => setMostrarModal(true)}>
+          Ver productos actualizados
+        </button>
+      </div>
+
+      {mostrarModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h3>Productos actualizados</h3>
+            {productosActualizados.length === 0 ? (
+              <p>No se han actualizado productos.</p>
+            ) : (
+              <ul style={{ textAlign: "left" }}>
+                {productosActualizados.map((p, i) => <li key={i}>{p}</li>)}
+              </ul>
+            )}
+            <button style={styles.pageBtn} onClick={() => setMostrarModal(false)}>Cerrar</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-//Estilos
+// Estilos
 const styles = {
   container: { padding: "20px", textAlign: "center" },
   title: { fontSize: "clamp(1.4rem, 4vw, 2rem)", color: "#333" },
   selectorContainer: {
-    margin: "20px 0",
+    margin: "20px 0 10px 0",
     display: "flex",
     justifyContent: "center",
     gap: "10px",
@@ -302,6 +301,26 @@ const styles = {
     fontSize: "16px",
     boxShadow: "0px 3px 6px rgba(0,0,0,0.1)",
     transition: "all 0.25s ease",
+  },
+  // Estilos para el filtro
+  filterContainer: {
+    marginBottom: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+  },
+  filterLabel: {
+    fontWeight: "bold",
+    color: "#444",
+  },
+  selectFilter: {
+    padding: "8px 12px",
+    borderRadius: "5px",
+    border: "1px solid #aaa",
+    fontSize: "15px",
+    cursor: "pointer",
+    outline: "none",
   },
   tableWrapper: {
     overflowX: "auto",

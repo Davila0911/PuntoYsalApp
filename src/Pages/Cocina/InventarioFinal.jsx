@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { getCocinaInventory, saveCocinaFinal } from "../../api/CocinaApi";
 
+// Categorias
+const categoriasCocina = [
+  "Verduras y frutas",
+  "Lácteos",
+  "Carnes & Embutidos",
+  "Aceite & Grasa",
+  "Salsas & Aderezos",
+  "Subproductos (prep)",
+  "Panes y harinas",
+  "Condimentos",
+  "Limpieza & Otros",
+];  
+
 function InventarioFinal() {
   const [productos, setProductos] = useState([]);
   const [page, setPage] = useState(1);
@@ -8,6 +21,7 @@ function InventarioFinal() {
   const [loading, setLoading] = useState(false);
   const [conteos, setConteos] = useState({});
   const [guardado, setGuardado] = useState({});
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   const itemsPerPage = 10;
 
   // Cargar inventario de cocina
@@ -15,7 +29,7 @@ function InventarioFinal() {
     const fetchInventario = async () => {
       try {
         setLoading(true);
-        const data = await getCocinaInventory(page, itemsPerPage);
+        const data = await getCocinaInventory(page, itemsPerPage, categoriaSeleccionada);
         setProductos(data.inventory || []);
         setTotalPages(Math.ceil((data.productCount || 1) / itemsPerPage));
       } finally {
@@ -23,7 +37,7 @@ function InventarioFinal() {
       }
     };
     fetchInventario();
-  }, [page]);
+  }, [page, categoriaSeleccionada]); 
 
   // Guardar conteo final
   const handleGuardar = async (codigo, valor) => {
@@ -52,8 +66,29 @@ function InventarioFinal() {
   };
 
   return (
+    
     <div style={styles.container}>
       <h2 style={styles.title}>Inventario Final - Cocina</h2>
+
+           {/* Selector de Categoría */}
+      <div style={styles.filterContainer}>
+        <label style={styles.filterLabel}>Categoría: </label>
+        <select
+          value={categoriaSeleccionada}
+          onChange={(e) => {
+            setCategoriaSeleccionada(e.target.value);
+            setPage(1); 
+          }}
+          style={styles.selectFilter}
+        >
+          <option value=""> Todas las categorías </option>
+          {categoriasCocina.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {loading ? (
         <p style={styles.loading}>Cargando productos...</p>
@@ -150,6 +185,7 @@ function InventarioFinal() {
   );
 }
 
+
 const styles = {
   container: {
     textAlign: "center",
@@ -160,14 +196,38 @@ const styles = {
   title: {
     fontSize: "clamp(1.4rem, 4vw, 2rem)",
     color: "#333",
+    marginBottom: "10px",
   },
+  filterContainer: {
+    marginBottom: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+  filterLabel: {
+    fontWeight: "600",
+    color: "#444",
+    fontSize: "14px",
+  },
+  selectFilter: {
+    padding: "8px 12px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+    fontSize: "14px",
+    outline: "none",
+    cursor: "pointer",
+    backgroundColor: "#fff",
+  },
+
   loading: {
     fontSize: "16px",
     color: "#555",
   },
   tableWrapper: {
     overflowX: "auto",
-    marginTop: "20px",
+    marginTop: "10px",
     borderRadius: "8px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
   },
@@ -176,10 +236,7 @@ const styles = {
     borderCollapse: "collapse",
     minWidth: "700px",
   },
-  headerRow: {
-    backgroundColor: "#388e3c",
-    color: "white",
-  },
+ 
   th: {
     padding: "10px",
     border: "1px solid #ddd",

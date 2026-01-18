@@ -20,15 +20,23 @@ const getTimeZoneId = () => {
   return tz || "Central America Standard Time";
 };
 
-// Obtener inventario del Bar
-export const getBarInventory = async (page = 1, itemsPerPage = 10) => {
-  const res = await fetch(
-    `${BASE_URL}/inventory?inventoryType=0&page=${page}&itemsPerPage=${itemsPerPage}`,
-    { headers: getHeaders() }
-  );
+// Obtener inventario del Bar con filtro de categoría
+export const getBarInventory = async (page = 1, itemsPerPage = 10, category = "") => {
+  try {
+    let url = `${BASE_URL}/inventory?inventoryType=0&page=${page}&itemsPerPage=${itemsPerPage}`;
+    
+    // Si hay categoría, se añade a la query
+    if (category && category.trim() !== "") {
+      url += `&category=${encodeURIComponent(category)}`;
+    }
 
-  if (!res.ok) throw new Error("Error al obtener inventario del bar");
-  return await res.json();
+    const res = await fetch(url, { headers: getHeaders() });
+
+    if (!res.ok) throw new Error("Error al obtener inventario del bar");
+    return await res.json();
+  } catch (error) {
+    throw new Error("No se pudo obtener el inventario del bar");
+  }
 };
 
 // Guardar inventario inicial
