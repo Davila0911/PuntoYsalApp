@@ -6,6 +6,7 @@ const categoriasBar = [
   "Gaseosas",
   "Jugos",
   "Frutas y frutas congeladas",
+  "Postres",
   "Tizanas",
   "Finest Call",
   "Leches líquidas y en polvo",
@@ -21,7 +22,6 @@ const categoriasBar = [
   "Productos Variados",
   "Plásticos",
   "Limpieza",
-  "Postres",
 ];
 
 
