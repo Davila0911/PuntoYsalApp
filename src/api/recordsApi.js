@@ -1,5 +1,7 @@
 import { getToken } from "./authApi";
 import { API_BASE_URL } from "./config";
+import { inventoryTypeToEnum } from "./AdminApi"; 
+
 const API_URL = `${API_BASE_URL}/api/users`;
 
 /**
@@ -36,8 +38,9 @@ export async function getUsers() {
  * @param {string} requestedDate 
  * @param {number} page 
  * @param {number} pageSize 
+ * @param {string|null} tipo - 🆕 OPCIONAL: "Bar" o "Cocina" para modo Administrador
  */
-export async function getUserRecords(userName, requestedDate, page = 1, pageSize = 12) {
+export async function getUserRecords(userName, requestedDate, page = 1, pageSize = 12, tipo = null) {
   if (!userName || !requestedDate) {
     throw new Error("Debe proporcionar userName y requestedDate válidos.");
   }
@@ -45,11 +48,18 @@ export async function getUserRecords(userName, requestedDate, page = 1, pageSize
   const token = getToken();
   const timeZoneId = getUserTimeZone();
 
-  const url = `${API_URL}/records?userName=${encodeURIComponent(
+  // Base URL construction
+  let url = `${API_URL}/records?userName=${encodeURIComponent(
     userName
   )}&requestedDate=${encodeURIComponent(
     requestedDate
   )}&page=${page}&pageSize=${pageSize}&timeZoneId=${encodeURIComponent(timeZoneId)}`;
+
+  
+  if (tipo) {
+    const mappedEnum = inventoryTypeToEnum(tipo);
+    url += `&inventoryType=${mappedEnum}`;
+  }
 
   try {
     const response = await fetch(url, {

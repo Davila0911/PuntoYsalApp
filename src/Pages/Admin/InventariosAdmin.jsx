@@ -167,7 +167,7 @@ function InventariosAdmin() {
           }}
           style={styles.selectFilter}
         >
-          <option value="">-- Ver Todo --</option>
+          <option value="">Ver Todo</option>
           {listaCategorias.map((cat, index) => (
             <option key={index} value={cat}>
               {cat}

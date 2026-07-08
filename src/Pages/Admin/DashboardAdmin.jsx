@@ -3,6 +3,7 @@ import InventariosAdmin from "./InventariosAdmin";
 import { logout } from "../../api/authApi";
 import RegistrosAdmin from "./RegistrosAdmin";
 import ListaCompras from "./ListaCompras";
+import CrearMovimientoAdmin from "./CrearMovimientoAdmin";
 
 function DashboardAdmin() {
   const [usuario, setUsuario] = useState(null);
@@ -105,9 +106,22 @@ function DashboardAdmin() {
               <button
                 style={{
                   ...styles.button,
-                  ...styles.red,
+                  ...styles.fade2,
                   animation: "fadeUp 0.5s ease-out forwards",
                   animationDelay: "1.1s",
+                  opacity: 0,
+                }}
+                onClick={() => setVista("crear")}
+              >
+                Crear
+              </button>
+
+              <button
+                style={{
+                  ...styles.button,
+                  ...styles.red,
+                  animation: "fadeUp 0.5s ease-out forwards",
+                  animationDelay: "1.4s",
                   opacity: 0,
                 }}
                 onClick={handleLogout}
@@ -166,6 +180,23 @@ function DashboardAdmin() {
               Volver al Menú
             </button>
             <ListaCompras />
+          </>
+        )}
+
+        {vista === "crear" && (
+          <>
+            <button
+              style={{
+                ...styles.back,
+                animation: "fadeUp 0.5s ease-out forwards",
+                animationDelay: "0.2s",
+                opacity: 0,
+              }}
+              onClick={() => setVista("menu")}
+            >
+              Volver al Menú
+            </button>
+            <CrearMovimientoAdmin />
           </>
         )}
       </div>
@@ -319,7 +350,7 @@ if (typeof document !== "undefined" && document.styleSheets.length > 0) {
       sheet.insertRule(fadeInToast, sheet.cssRules.length);
       sheet.insertRule(progressShrink, sheet.cssRules.length);
   } catch (e) {
-      // Ignorar si ya existen
+      
   }
 }
 
